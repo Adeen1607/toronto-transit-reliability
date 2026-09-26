@@ -1,0 +1,44 @@
+Delay Events :=
+DISTINCTCOUNT ( fact_delay_events[delay_event_id] )
+
+Recorded Delay Events :=
+CALCULATE (
+    [Delay Events],
+    fact_delay_events[has_recorded_delay] = TRUE ()
+)
+
+Total Delay Minutes :=
+SUM ( fact_delay_events[min_delay] )
+
+Average Delay Minutes :=
+AVERAGE ( fact_delay_events[min_delay] )
+
+Total Gap Minutes :=
+SUM ( fact_delay_events[min_gap] )
+
+Severe Delay Events :=
+CALCULATE (
+    [Delay Events],
+    fact_delay_events[severe_delay] = TRUE ()
+)
+
+Severe Event Rate :=
+DIVIDE ( [Severe Delay Events], [Delay Events] )
+
+Routes Affected :=
+DISTINCTCOUNT ( fact_delay_events[route] )
+
+Delay Minutes per Event :=
+DIVIDE ( [Total Delay Minutes], [Delay Events] )
+
+Previous Month Delay Minutes :=
+CALCULATE (
+    [Total Delay Minutes],
+    DATEADD ( dim_date[Date], -1, MONTH )
+)
+
+Monthly Delay Change % :=
+DIVIDE (
+    [Total Delay Minutes] - [Previous Month Delay Minutes],
+    [Previous Month Delay Minutes]
+)
