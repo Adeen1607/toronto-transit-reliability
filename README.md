@@ -45,3 +45,32 @@ python src/build_model.py
 ## Interpretation
 
 A recorded delay event is not the same as passenger delay. The source does not provide ridership exposure for every event, so total minutes and event counts are operational indicators rather than estimates of total customer time lost. Reporting periods and fields can change across source files.
+
+
+## Rebuild the reading edition
+
+```bash
+python -m pip install -r requirements-research.txt
+python scripts/build_research_site.py
+```
+
+This renders saved notebook outputs without rerunning model training or external APIs. To refresh findings, run the analysis commands above first, update `reports/research-findings.md`, and rebuild.
+
+<!-- research-edition:start -->
+## Research edition
+
+[Research report and final visual results](research/report.md) · [Browser-ready notebook catalogue](research/notebooks.html)
+
+Fresh execution on 11 October 2026 using the **2024 workbook only**. After the pipeline eligibility filters, **59,021 events** remain, totaling **1,263,332 recorded vehicle-delay minutes**. The leading incident category by minutes is **Diversion**. The values measure recorded incidents, not passenger minutes or delay per scheduled trip.
+
+| Measure | Value |
+|---|---:|
+| events | 59021 |
+| recorded delay minutes | 1263332.0000 |
+| source window | 2024 |
+
+
+
+The `research/` folder contains a professional static reading edition. The Pages workflow deploys it after GitHub Pages is enabled with **GitHub Actions** as the publishing source. Intended URL: `https://adeen1607.github.io/toronto-transit-reliability/`. Deployment status must be checked in Actions before treating that address as live.
+
+<!-- research-edition:end -->
