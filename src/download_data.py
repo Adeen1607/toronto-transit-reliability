@@ -31,15 +31,26 @@ def download(destination: Path) -> list[Path]:
         raise ValueError("Toronto Open Data catalogue request was unsuccessful.")
 
     downloaded = []
+    used_filenames: set[str] = set()
     for number, resource in enumerate(payload["result"]["resources"], start=1):
         resource_format = str(resource.get("format", "")).upper()
         if resource_format not in TABULAR_FORMATS:
             continue
 
         url = resource["url"]
-        suffix = Path(urlparse(url).path).suffix or f".{resource_format.lower()}"
+        suffix = Path(urlparse(url).path).suffix.lower()
+        if suffix not in {".csv", ".xls", ".xlsx"}:
+            suffix = f".{resource_format.lower()}"
         name = safe_name(resource.get("name") or f"ttc_bus_delay_{number}")
-        target = destination / f"{name}{suffix}"
+        filename = f"{name}{suffix}"
+        if filename.lower() in used_filenames:
+            filename = f"{name}_{number}{suffix}"
+            suffix_number = 2
+            while filename.lower() in used_filenames:
+                filename = f"{name}_{number}_{suffix_number}{suffix}"
+                suffix_number += 1
+        used_filenames.add(filename.lower())
+        target = destination / filename
 
         with requests.get(url, stream=True, timeout=180) as file_response:
             file_response.raise_for_status()

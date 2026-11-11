@@ -23,7 +23,12 @@ def normalize_columns(frame: pd.DataFrame) -> pd.DataFrame:
         "gap": "min_gap",
         "gap_min": "min_gap",
     }
-    return data.rename(columns={key: value for key, value in aliases.items() if key in data})
+    # Prefer the canonical field when the source contains both spellings.
+    # Renaming all aliases at once would create duplicate DataFrame columns.
+    for alias, canonical in aliases.items():
+        if alias in data.columns and canonical not in data.columns:
+            data = data.rename(columns={alias: canonical})
+    return data
 
 
 def read_resource(path: Path) -> list[pd.DataFrame]:
